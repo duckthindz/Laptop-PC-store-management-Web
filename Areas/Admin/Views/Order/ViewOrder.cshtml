@@ -1,0 +1,102 @@
+﻿@model IEnumerable<OrderDetail>
+@{
+    ViewData["title"] = "Order Detail";
+    decimal total = 0;
+    decimal subtotal = 0;
+}
+<!DOCTYPE 
+<html>
+<head>
+    <meta name="viewport" content="width=device-with" />
+    <title>Order Details</title>
+</head>
+    <body>
+    <h3>List OrderDetail</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+
+                <th scope="col">User Name</th>
+                <th scope="col">Order Code</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Product Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                subtotal = item.Quantity * item.Price;
+                total += subtotal;
+                <tr>
+                    <input type="hidden" asp-for="@item.OrderCode" class="getId"/>
+                    <th scope="row">@item.Id</th>
+                    <td>@item.UserName</td>
+                    <td>@item.OrderCode</td>
+                    <td>@item.Product.Name</td>
+                    <td>@item.Price</td>
+                    <td>@item.Quantity</td>
+                    <td>@subtotal.ToString("C")</td>
+
+                </tr>
+                }
+            <tr>
+                <th colspan="5">Total:</th>
+                <td>@total.ToString("C")</td>
+                <td>
+                    
+                    <select class="form-control select-update-order" id="orderStatus">
+                        <option value="1">Đơn hàng mới</option>
+                        <option value="0">Đã xử lý</option>
+                    </select>
+                </td>
+            </tr>
+
+        </tbody>
+
+    </table>
+    </body>
+</html> 
+           @* Đang lổi đợi fix *@
+@section Scripts {    
+    <script>
+        // Example: Set default value based on a variable or condition
+        document.addEventListener('DOMContentLoaded', function () {
+            var defaultValue = 1; // Set this to the value you want to select by default
+            var selectElement = document.getElementById('orderStatus');
+            selectElement.value = defaultValue; // Set the value programmatically
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('.select-update-order').change(function () {
+                var status = $(this).val();
+                var ordercode = $('.getId').val();
+
+                // alert(status);
+                // alert(ordercode)
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateOrder")",
+                    data: { status: status, ordercode: ordercode },
+                    success: function (result) {
+                        console.log("@Url.Action("UpdateOrder")");
+                        if (result.success) {
+                            Swal.fire("Cập nhật thành công");
+                        } 
+                        else 
+                        {
+                            Swal.fire("cập nhật thất bại" + result.message);
+                        }
+                    },
+                    error: function (req, status, error) {
+                        console.error("Error updating order", error);
+                    }
+                });
+            });
+        });
+    </script>
+}
